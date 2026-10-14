@@ -7,8 +7,8 @@ import { eq, sql } from 'drizzle-orm';
 
 import { DEFAULT_FOLDER_NAME } from '@/config';
 
-import { exercises, folders, routines, workoutSessions } from './schema';
-import { bootstrapDatabase } from './seed';
+import { exercises, folders, routines, settings, workoutSessions } from './schema';
+import { bootstrapDatabase, SEED_VERSION } from './seed';
 import { BUILTIN_EXERCISES } from './seed/exercises';
 import { createTestDb, testId } from './test-db';
 
@@ -38,6 +38,20 @@ describe('база даних', () => {
     expect(second).toEqual({ catalogUpdated: false, defaultFolderCreated: false });
     expect(countRows(db, exercises)).toBe(BUILTIN_EXERCISES.length);
     expect(countRows(db, folders)).toBe(1);
+  });
+
+  it('нова версія каталогу оновлює вбудовані вправи на місці, не чіпаючи їхні id', () => {
+    const { db } = createTestDb();
+    bootstrapDatabase(db, NOW, testId);
+    const sample = BUILTIN_EXERCISES[0];
+    db.update(exercises).set({ aliases: ['стара назва'] }).where(eq(exercises.id, sample.id)).run();
+    db.update(settings).set({ value: SEED_VERSION - 1 }).where(eq(settings.key, 'seed_version')).run();
+
+    const result = bootstrapDatabase(db, NOW + 1000, testId);
+
+    expect(result.catalogUpdated).toBe(true);
+    expect(countRows(db, exercises)).toBe(BUILTIN_EXERCISES.length);
+    expect(db.select().from(exercises).where(eq(exercises.id, sample.id)).get()?.aliases).toEqual(sample.aliases);
   });
 
   it('JSON-поля і булеві значення читаються в правильних типах', () => {

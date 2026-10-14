@@ -7,7 +7,7 @@ import type { Db } from '../types';
 import { BUILTIN_EXERCISES } from './exercises';
 
 /** Збільшуй, коли змінюєш вбудований каталог — тоді він оновиться в уже встановленій апці. */
-export const SEED_VERSION = 1;
+export const SEED_VERSION = 2;
 
 const SEED_VERSION_KEY = 'seed_version';
 

@@ -593,7 +593,7 @@ export const BUILTIN_EXERCISES: BuiltinExercise[] = [
   {
     id: '96763e13-4da7-511a-84b9-d0fd2aeaa928',
     name: 'Зворотні віджимання від лави',
-    aliases: ['віджимання від лави', 'обратные отжимания', 'bench dip'],
+    aliases: ['віджимання від лави', 'обратные отжимания', 'triceps bench dip'],
     primaryMuscles: ['triceps'],
     secondaryMuscles: ['chest', 'front_delts'],
     equipment: 'bodyweight',

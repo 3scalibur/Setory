@@ -99,3 +99,60 @@ export interface TargetSet {
   durationSec?: number;
   distanceM?: number;
 }
+
+/** Цифри підходу. Для assisted_bodyweight weightKg — це допомога. */
+export interface SetValues {
+  weightKg?: number;
+  reps?: number;
+  durationSec?: number;
+  distanceM?: number;
+}
+
+/** Підхід з його типом (розминка / робочий / дроп / до відмови). */
+export interface PerformedSet extends SetValues {
+  kind: SetKind;
+}
+
+/**
+ * Виконаний підхід із журналу — плаский рядок для prefill, ↑ і 🏆.
+ * Шар даних віддає лише виконані підходи (completed) із завершених сесій (status = 'finished')
+ * без м'якого видалення. Активна сесія сюди не входить.
+ */
+export interface HistorySet extends PerformedSet {
+  id: string;
+  sessionId: string;
+  sessionExerciseId: string;
+  exerciseId: string;
+  source: SessionSource;
+  /** Знімок назви сесії: «Push», «Окрема вправа»… */
+  sessionTitle: string;
+  finishedAt: number;
+  /** Місце вправи в сесії (session_exercises.position). */
+  exercisePosition: number;
+  /** Місце підходу у вправі (set_entries.position). */
+  position: number;
+  completedAt: number;
+}
+
+/** Вправа в завершеній сесії — зведення для backlog, ротації і «коли тренувався м'яз». */
+export interface HistorySessionExercise {
+  exerciseId: string;
+  /** Слот програми, який виконує ця вправа (лише в сесіях програми). */
+  routineExerciseId?: string;
+  skipped: boolean;
+  /** Скільки виконаних робочих (не розминочних) підходів. */
+  workingSetsDone: number;
+  targets?: TargetSet[];
+  restSec?: number;
+}
+
+/** Завершена сесія — зведення без окремих підходів. */
+export interface HistorySession {
+  id: string;
+  source: SessionSource;
+  folderId?: string;
+  routineId?: string;
+  title: string;
+  finishedAt: number;
+  exercises: HistorySessionExercise[];
+}
