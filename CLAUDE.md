@@ -14,7 +14,7 @@
 - `src/app/` — екрани (Expo Router). Тонкі: без SQL і без правил ТЗ.
 - `src/domain/` — уся логіка ТЗ, чисті функції + `*.test.ts` поруч. Не імпортує нічого з React Native, `src/db` чи UI.
 - `src/data/` — єдине місце з запитами Drizzle. Приймає `Db` з `src/db/types.ts`.
-- `src/services/` — сценарії (почати тренування, виконати підхід): data → domain → data.
+- `src/services/` — сценарії для екранів: data → domain → data. Приймають `Deps` (`deps.ts`); на телефоні — `appDeps`, у тестах — `createTestDeps()`. Помилки для користувача — `UserError` з українським текстом.
 - `src/db/` — схема, клієнт, seed. `drizzle/` — згенеровані міграції.
 - `src/config.ts` — усі константи з ТЗ.
 

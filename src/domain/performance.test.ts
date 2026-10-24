@@ -1,5 +1,5 @@
 import { journal, set, target, targets, warm } from './__fixtures__/journal';
-import { buildPrefill, lastPerformance } from './performance';
+import { buildPrefill, lastPerformance, previousForSets } from './performance';
 
 const BENCH = 'bench';
 const ROW = 'row';
@@ -197,5 +197,30 @@ describe('buildPrefill', () => {
       'working',
       'failure',
     ]);
+  });
+});
+
+describe('previousForSets', () => {
+  it('«Попереднє» для вже доданих підходів: розминка — до розминки, робочі — за номером серед робочих', () => {
+    const { sets } = journal([
+      { source: 'free', day: 0, exercises: [{ exerciseId: BENCH, sets: [warm(20, 12), set(60, 8), set(62.5, 6)] }] },
+    ]);
+    const last = lastPerformance(BENCH, sets);
+
+    const previous = previousForSets(
+      [{ kind: 'working' }, { kind: 'warmup' }, { kind: 'drop' }, { kind: 'working' }],
+      last,
+    );
+
+    expect(previous).toEqual([
+      { kind: 'working', weightKg: 60, reps: 8 },
+      { kind: 'warmup', weightKg: 20, reps: 12 },
+      { kind: 'working', weightKg: 62.5, reps: 6 },
+      undefined,
+    ]);
+  });
+
+  it('без історії — порожньо', () => {
+    expect(previousForSets([{ kind: 'working' }], null)).toEqual([undefined]);
   });
 });

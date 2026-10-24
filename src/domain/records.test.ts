@@ -1,5 +1,5 @@
 import { journal, set, warm } from './__fixtures__/journal';
-import { evaluateSetPRs, rebuildPRs, type RecordSet } from './records';
+import { currentBests, evaluateSetPRs, rebuildPRs, type RecordSet } from './records';
 import type { PerformedSet } from './types';
 
 const w = (weightKg: number, reps: number, kind: PerformedSet['kind'] = 'working'): PerformedSet => ({
@@ -125,5 +125,27 @@ describe('rebuildPRs', () => {
 
     expect(records.has('s0-e0-s0')).toBe(true);
     expect(records.has('s1-e0-s0')).toBe(false);
+  });
+});
+
+describe('currentBests — поточні рекорди для картки вправи', () => {
+  it('вагові: найбільша вага, 1ПМ і об’єм; розминка не рахується', () => {
+    const bests = currentBests([w(60, 8), w(65, 5), w(50, 15), w(100, 1, 'warmup')], 'weight_reps');
+
+    expect(bests.max_weight).toBe(65);
+    expect(bests.max_volume).toBe(750);
+    expect(bests.e1rm).toBeCloseTo(76, 5);
+  });
+
+  it('гравітрон: найменша допомога; час; дистанція', () => {
+    expect(currentBests([w(30, 8), w(20, 5)], 'assisted_bodyweight').min_assistance).toBe(20);
+    expect(currentBests([{ kind: 'working', durationSec: 90 }], 'duration')).toEqual({ max_duration: 90 });
+    expect(currentBests([{ kind: 'working', distanceM: 5000, durationSec: 1500 }], 'distance_duration')).toEqual({
+      max_distance: 5000,
+    });
+  });
+
+  it('немає історії — порожньо', () => {
+    expect(currentBests([], 'weight_reps')).toEqual({});
   });
 });

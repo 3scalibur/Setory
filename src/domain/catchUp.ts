@@ -172,18 +172,21 @@ export interface RoutineSlotEstimate {
   inBacklog: boolean;
 }
 
-export interface RoutineBudgetPlan {
+export interface RoutineBudgetPlan<T extends RoutineSlotEstimate = RoutineSlotEstimate> {
   /** У порядку програми; fits = false → «не встигну». */
-  slots: (RoutineSlotEstimate & { fits: boolean })[];
+  slots: (T & { fits: boolean })[];
   plannedSec: number;
   /** Скільки часу лишилось — на 1–2 вправи з пропущених. */
   leftoverSec: number;
 }
 
 /** Що з програми вміщається в бюджет: базові і ті, що вже в пропущених, — першими. */
-export function fitRoutineToBudget(slots: readonly RoutineSlotEstimate[], timeBudgetMin: number): RoutineBudgetPlan {
+export function fitRoutineToBudget<T extends RoutineSlotEstimate>(
+  slots: readonly T[],
+  timeBudgetMin: number,
+): RoutineBudgetPlan<T> {
   const budgetSec = timeBudgetMin * 60;
-  const score = (s: RoutineSlotEstimate) => (s.mechanic === 'compound' ? 2 : 0) + (s.inBacklog ? 1 : 0);
+  const score = (s: T) => (s.mechanic === 'compound' ? 2 : 0) + (s.inBacklog ? 1 : 0);
   const byPriority = slots.map((s, index) => ({ s, index })).sort((a, b) => score(b.s) - score(a.s) || a.index - b.index);
 
   const fits = new Set<number>();

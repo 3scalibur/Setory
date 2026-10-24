@@ -87,8 +87,17 @@ Setory/
 │  │  ├─ test-db.ts                  # SQLite у Node для тестів
 │  │  ├─ use-database-ready.ts       # міграції + підготовка на старті
 │  │  └─ seed/                       # 65 вбудованих вправ, папка «Мої програми»
-│  ├─ data/                          # репозиторії: exercises, folders, routines, sessions, history, settings
-│  ├─ services/sessionService.ts
+│  ├─ data/                          # репозиторії: exercises, folders, routines, sessions, history, backlog, settings
+│  ├─ services/                      # сценарії для екранів (тести — на справжній SQLite)
+│  │  ├─ deps.ts                     # Deps (db, годинник, id), UserError, транзакції
+│  │  ├─ app-deps.ts                 # справжні залежності на телефоні
+│  │  ├─ sessionService.ts           # старт у 4 режимах, підходи, завершення, продовження
+│  │  ├─ sessionView.ts              # екран тренування: «Попереднє», 🏆, ↑, підсумок
+│  │  ├─ folderService.ts            # папки
+│  │  ├─ routineService.ts           # конструктор і картка програми, вкладка «Тренування»
+│  │  ├─ backlogService.ts           # пропущені, день пропущених, «маю N хвилин»
+│  │  ├─ exerciseService.ts          # пошук, власні вправи, картка вправи
+│  │  └─ historyService.ts           # вкладка «Історія»
 │  ├─ features/                      # workout-tab, routine-editor, session, exercise-search, backlog
 │  └─ ui/                            # базові компоненти (екран, тема)
 ├─ drizzle/                          # згенеровані міграції (не редагуються руками)
@@ -223,7 +232,8 @@ settings
 | 14, 23 | `src/domain/rotation.test.ts` |
 | 15, 16 | `src/domain/catchUp.test.ts` |
 | 20, 21 | `src/domain/progress.test.ts` |
-| 17 (апку вбито посеред сесії), 22 (видалення папки) | етап 4 — це поведінка бази і сервісу, а не чистої логіки |
+| 17 (апку вбито посеред сесії) | `src/services/sessionService.test.ts` |
+| 22 (видалення папки) | `src/services/routines.test.ts` |
 
 ## 7. Рішення, які я прийняв сам
 

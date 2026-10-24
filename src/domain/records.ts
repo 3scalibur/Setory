@@ -116,3 +116,39 @@ function beatsMax(value: number, prior: number[]): boolean {
 function beatsMin(value: number, prior: number[]): boolean {
   return prior.length > 0 && prior.every((p) => greater(p, value));
 }
+
+/** Поточні найкращі значення для картки вправи (показники без «з цією вагою»). */
+export function currentBests(
+  sets: readonly PerformedSet[],
+  type: ExerciseType,
+): Partial<Record<PRType, number>> {
+  const working = sets.filter(isWorking);
+  const out: Partial<Record<PRType, number>> = {};
+  const put = (key: PRType, values: number[], pick: 'max' | 'min' = 'max') => {
+    if (values.length > 0) out[key] = pick === 'max' ? Math.max(...values) : Math.min(...values);
+  };
+
+  switch (type) {
+    case 'weight_reps':
+    case 'weighted_bodyweight': {
+      const all = working.map(weighted).filter((p) => p !== null);
+      put('max_weight', all.map((p) => p.w));
+      put('e1rm', all.map((p) => epley1RM(p.w, p.r)).filter((v) => v !== undefined));
+      put('max_volume', all.map((p) => p.w * p.r));
+      break;
+    }
+    case 'assisted_bodyweight':
+      put('min_assistance', working.map(weighted).filter((p) => p !== null).map((p) => p.w), 'min');
+      break;
+    case 'bodyweight_reps':
+      put('max_reps', numbers(working.map((s) => s.reps)));
+      break;
+    case 'duration':
+      put('max_duration', numbers(working.map((s) => s.durationSec)));
+      break;
+    case 'distance_duration':
+      put('max_distance', numbers(working.map((s) => s.distanceM)));
+      break;
+  }
+  return out;
+}

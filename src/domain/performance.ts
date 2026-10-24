@@ -107,3 +107,18 @@ function fromTarget(t: TargetSet | undefined): SetValues {
   if (!t) return {};
   return valuesOf({ weightKg: t.weightKg, reps: t.repsMin, durationSec: t.durationSec, distanceM: t.distanceM });
 }
+
+/**
+ * «Попереднє» для підходів, які вже є у вправі (користувач міг додати, видалити чи змінити тип).
+ * Розминка порівнюється з розминкою, робочі — за номером серед робочих.
+ */
+export function previousForSets(
+  sets: readonly { kind: SetKind }[],
+  last: LastPerformance | null,
+): (PerformedSet | undefined)[] {
+  let warmupIndex = 0;
+  let workingIndex = 0;
+  return sets.map((s) =>
+    isWorking(s) ? last?.working[workingIndex++] : last?.warmups[warmupIndex++],
+  );
+}
