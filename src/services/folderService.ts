@@ -80,3 +80,11 @@ function requireFolder(d: Deps, id: string) {
   if (!folder) throw new UserError('Папку не знайдено.');
   return folder;
 }
+
+export function getFolders(deps: Deps): { id: string; name: string; isActive: boolean }[] {
+  return data.listFolders(deps.db).map((f) => ({ id: f.id, name: f.name, isActive: f.isActive }));
+}
+
+export function getFolderName(deps: Deps, id: string): string | null {
+  return data.getFolder(deps.db, id)?.name ?? null;
+}

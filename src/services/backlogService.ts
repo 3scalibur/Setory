@@ -154,3 +154,16 @@ export function getRoutineBudgetPlan(
 function catalogMap(deps: Deps): Map<string, ExerciseRow> {
   return new Map(listExercises(deps.db).map((e) => [e.id, e]));
 }
+
+/** Оцінка часу кожної пропущеної вправи, с — щоб додавати вправи в день пропущених вручну. */
+export function getBacklogEstimates(deps: Deps): Map<string, number> {
+  const backlog = getBacklog(deps);
+  const history = loadHistorySets(deps.db, backlog.map((b) => b.exerciseId));
+  const setCountSource = getSettings(deps.db).prefillSetCount;
+  return new Map(
+    backlog.map((b) => [
+      b.exerciseId,
+      estimateExercise({ exerciseId: b.exerciseId, mechanic: b.mechanic, targets: b.targets, restSec: b.restSec, history, setCountSource }),
+    ]),
+  );
+}

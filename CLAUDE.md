@@ -30,6 +30,13 @@
 
 - Доменні функції: спершу тест зі сценарієм ТЗ (розділ 12), потім код.
 - Код, що працює з БД, тестується на справжній SQLite: `createTestDb()` з `src/db/test-db.ts` (файл з `@jest-environment node`).
+- Сервіси — `createTestDeps()` з `src/services/test-deps.ts`. Екрани — наскрізні тести в `src/__tests__/app-flow.test.tsx` (`renderRouter`, справжня SQLite, нативне підмінене).
+
+## Екрани
+
+- Дані: `useLive(useCallback(() => service(appDeps, …), [deps]))` — оновлюються після кожного запису в БД.
+- Дії: `run()` / `succeeded()` з `src/ui/run.ts`. Компоненти — `src/ui/kit.tsx`, кольори — `src/ui/colors.ts`, тексти й формати — `src/ui/format.ts`.
+- Тести — у `src/__tests__/`, не в `src/app/` (там кожен файл — маршрут).
 
 ## Скіли
 

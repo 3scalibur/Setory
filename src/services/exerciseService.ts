@@ -2,6 +2,7 @@
 
 import * as data from '@/data/exercises';
 import { loadHistorySets } from '@/data/history';
+import { lastPerformance, type LastPerformance } from '@/domain/performance';
 import { rebuildPRs, currentBests, type PRType } from '@/domain/records';
 import { searchExercises, similarExercises, type SearchFilters } from '@/domain/search';
 import type { Equipment, ExerciseType, Mechanic, MuscleGroup, PerformedSet, SessionSource } from '@/domain/types';
@@ -133,4 +134,34 @@ function requireCustom(d: Deps, id: string) {
   if (!e || e.deletedAt !== null) throw new UserError('Вправу не знайдено.');
   if (!e.isCustom) throw new UserError('Вбудовані вправи змінювати не можна.');
   return e;
+}
+
+export interface ExerciseBrief {
+  id: string;
+  name: string;
+  type: ExerciseType;
+  mechanic: Mechanic;
+  primaryMuscles: MuscleGroup[];
+  equipment: Equipment;
+  isCustom: boolean;
+}
+
+/** Коротка інформація про вправи за id (для конструктора програми). */
+export function getExerciseBriefs(deps: Deps, ids: readonly string[]): Map<string, ExerciseBrief> {
+  const wanted = new Set(ids);
+  return new Map(
+    data
+      .listExercises(deps.db)
+      .filter((e) => wanted.has(e.id))
+      .map((e) => [
+        e.id,
+        { id: e.id, name: e.name, type: e.type, mechanic: e.mechanic, primaryMuscles: e.primaryMuscles, equipment: e.equipment, isCustom: e.isCustom },
+      ]),
+  );
+}
+
+/** «Минулого разу» для кількох вправ одразу. */
+export function getLastPerformances(deps: Deps, ids: readonly string[]): Map<string, LastPerformance | null> {
+  const history = loadHistorySets(deps.db, ids);
+  return new Map(ids.map((id) => [id, lastPerformance(id, history)]));
 }

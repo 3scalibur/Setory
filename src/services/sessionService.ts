@@ -449,3 +449,8 @@ export function groupBy<T, K>(items: readonly T[], key: (item: T) => K): Map<K, 
   }
   return map;
 }
+
+/** Чи є зараз незавершене тренування (для кнопки «Виконати» / «Додати»). */
+export function hasActiveSession(deps: Deps): boolean {
+  return data.getActiveSession(deps.db) !== undefined;
+}

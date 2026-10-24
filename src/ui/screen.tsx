@@ -1,30 +1,23 @@
 import type { ReactNode } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView, Text } from 'react-native';
 
-import { useColors } from './theme';
+import { colors } from './colors';
 
-/** Базовий екран: безпечні відступи, прокрутка і заголовок. */
-export function Screen({ title, children }: { title: string; children?: ReactNode }) {
-  const colors = useColors();
+/**
+ * Базовий екран з прокруткою. На екранах стеку заголовок задає Stack.Screen,
+ * на вкладках (без заголовка стеку) — проп title.
+ */
+export function Screen({ title, children }: { title?: string; children?: ReactNode }) {
   return (
-    <SafeAreaView edges={['top']} style={[styles.root, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-        {children}
-      </ScrollView>
-    </SafeAreaView>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      contentInsetAdjustmentBehavior="automatic"
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
+      contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 48 }}
+    >
+      {title ? <Text style={{ fontSize: 32, fontWeight: '700', color: colors.label }}>{title}</Text> : null}
+      {children}
+    </ScrollView>
   );
 }
-
-export function Muted({ children }: { children: ReactNode }) {
-  const colors = useColors();
-  return <Text style={[styles.muted, { color: colors.textSecondary }]}>{children}</Text>;
-}
-
-const styles = StyleSheet.create({
-  root: { flex: 1 },
-  content: { padding: 16, gap: 12 },
-  title: { fontSize: 32, fontWeight: '700' },
-  muted: { fontSize: 15 },
-});
